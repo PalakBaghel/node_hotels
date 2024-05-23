@@ -16,9 +16,14 @@
 // to sum it up the DB.JS file act as a central module that manages the connection to your MongoDB database using mongoose it set up the connection handles connection events and exports the connection object so that your Express.JS server (or other parts of your application) can use it to interact with the database when your server runs it typically requires or imports this db.JS file to establish the database connection before handling http requests.
 
 const mongoose = require('mongoose');
+require('dotenv').config();
+
 
 //define the mongoDB connection URL
-const mongoURL = 'mongodb://localhost:27017/hotels'
+//const mongoURL = 'mongodb://localhost:27017/hotels'
+//const mongoURL = 'mongodb+srv://palakbaghel09:Palak9340766@cluster0.f5phv2e.mongodb.net/'
+const mongoURL = process.env.MONGODB_URL;
+//const mongoURL =  process.env.MONGODB_LOCAL_URL;
 
 mongoose.connect(mongoURL, {
     useNewUrlParser: true,

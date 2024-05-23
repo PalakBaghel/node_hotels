@@ -57,6 +57,8 @@ const app = express(); // app m store krlo express ko // exprees ka blueprint im
                        //app is like instance of express
 
 const db = require('./db');
+require('dotenv').config();
+const PORT = process.env.PORT || 3000;
 
 const bodyParser = require('body-parser');
 app.use(bodyParser.json()); //req.body
@@ -174,7 +176,9 @@ app.get('/', function (req, res){
 const personRoutes = require('./routes/personRoutes');
 app.use('/person', personRoutes);
 
-app.listen(3000, ()=>{
+//const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, ()=>{
     console.log('listening on port 3000') // server is live now
 })
 

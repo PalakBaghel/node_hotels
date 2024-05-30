@@ -56,20 +56,51 @@ const express = require('express');
 const app = express(); // app m store krlo express ko // exprees ka blueprint imported in app
                        //app is like instance of express
 
+
 const db = require('./db');
+const passport = require('./auth');
+
 require('dotenv').config();
 const PORT = process.env.PORT || 3000;
 
 const bodyParser = require('body-parser');
 app.use(bodyParser.json()); //req.body
 
-//const Person = require('./models/Person');
+
+
+
+//MIDDLEWARE FUNCTION
+// imagine you are a restaurant and you have placed order for your favourite dish now before that dish reaches your table it goes through several stages in the kitchen each stage involves different task like chopping vegetable cooking and adding spices middleware is bit like these stages in the kitchen it's something that happens in between your request and the final response in the web application
+
+const logRequest = (req, res, next) =>{
+   console.log(`${new Date().toLocaleString()} Request Made to : ${req.originalURL}`);
+   next(); //move on to next phase
+}
+
+//use in particular route "/"
+// app.get('/',logRequest, function (req, res){
+//   res.send('welcome to server')
+// })
+//to use in all route use 
+app.use(logRequest);
+
+
+
+//to initialize password in auth.js
+app.use(passport.initialize());
+
+const localAuthMiddleware = passport.authenticate('local', {session :false})
+
+app.get('/', function (req, res){
+  res.send('welcome to server')
+})
+const Person = require('./models/Person');
 
 //server can only listen to these two get request  that is present in menu list
         //end point = '/'               
-app.get('/', function (req, res){
-    res.send('welcome to server')
-})
+// app.get('/', function (req, res){
+//     res.send('welcome to server')
+// })
 
 // app.get('/hello', (req, res)=>{
 //     res.send("My name is palak");
@@ -118,38 +149,38 @@ app.get('/', function (req, res){
 
 
 //async and await
-// app.post('/person' ,async(req, res)=>{
-//    try{
-//     // assuming the request body contains the person data
-//     const data = req.body
-//     //create a new person document using the moongoose mode//blank person
-//     const newPerson = new Person(data);
-//     //save the new person to the database
-//     const response =  await newPerson.save();
-//     console.log('data saved');
-//     res.status(200).json(response);
-//    } 
-//    catch(err){
-//     console.log(err);
-//     res.status(500).json({error : 'Internal server error'});
-//    }
+app.post('/person' ,async(req, res)=>{
+   try{
+    // assuming the request body contains the person data
+    const data = req.body
+    //create a new person document using the moongoose mode//blank person
+    const newPerson = new Person(data);
+    //save the new person to the database
+    const response =  await newPerson.save();
+    console.log('data saved');
+    res.status(200).json(response);
+   } 
+   catch(err){
+    console.log(err);
+    res.status(500).json({error : 'Internal server error'});
+   }
   
 
-//  })
+ })
 
  //get method to get person
-//   app.get('/person', async(req, res)=>{
-//     try{
-//         const data = await Person.find();
-//         console.log('data fetched');
-//         res.status(200).json(data);
+  app.get('/person', async(req, res)=>{
+    try{
+        const data = await Person.find();
+        console.log('data fetched');
+        res.status(200).json(data);
         
-//     }
-//     catch(err){
-//         console.log(err);
-//         res.status(500).json({error : 'Internal server error'});
-//        }
-//   })
+    }
+    catch(err){
+        console.log(err);
+        res.status(500).json({error : 'Internal server error'});
+       }
+   })
 
   //query params
 

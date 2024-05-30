@@ -1,0 +1,180 @@
+imagine you are the manager of the node Hotel application and you want to ensure that only authorised staff members can access certain features this is where authentication comes in.
+
+verifying identity authentication : scenario : when a staff member let say a chef wants to login to the node hotel system they need to prove that they are indeed the chef they claim to be.
+
+in practice :  in node JS authentication involves checking the chef's credentials like a username and password to make sure that they match what's on record it's like asking The Chef to enter a secret code (password) and confirming that its correct.
+
+ access control (authorisation) : now let's add a layer of authorisation based on the roles of the staff member.
+ 
+ scenario :  once the Chef has proven their identity you as the manager want to control what they can and cannot do. for instance Chef should be able to update the menu items but may not manage staff salaries.
+
+in practice : in node.js after authenticating the Chef you will use authorisation to decide what part of the system they have access to its like giving the chef a key card (authorisation) that lets them into the kitchen but not into the manager's office.
+
+
+Implementation in Node.js:
+
+1. Authentication Middleware:
+
+• In your Node.js application, you might use middleware like Passport to
+handle the authentication process.
+
+• Passport helps verify the identity of the chef based on their provided credentials.
+
+2. User Roles and Permissions:
+
+• You'll define roles for staff members (e.g., chef, waiter, manager).
+
+• Authorization middleware will check the role of the authenticated user and grant access accordingly.
+
+3. Secure Endpoints:
+
+• You'll protect certain routes (like updating menu items) with authentication checks.
+
+Only authenticated and authorized users (like chefs) will be allowed to access these routes.
+
+In the Hotel Context:
+
+• Authentication: When Chef John logs in, the system checks if the provided username and password match what's on record for Chef John
+
+• Authorization: Once authenticated, Chef John is authorized to modify menu items but may not have Permission to change other critical settings.
+
+
+In simple terms, authentication in Node.js for your hotel application ensures that each staff member is who they say they are, and authorization determines what they're allowed to do once their identity is confirmed.
+
+It's like having a secure system where only the right people get access to the right areas of your hotel management application.
+
+In general, authentication is applied before authorization in the security process.
+
+Here's the typical sequence:
+
+1. Authentication:
+
+The first step is to verify the identity of the user or system entity attempting to access a resource or perform an action. This involves checking credentials such as usernames and passwords or using other authentication methods like tokens, API keys, or certificates.
+
+2. Authorization:
+
+• Once the identity is verified through authentication, the system moves on to authorization. Authorization determines what actions or resources the authenticated user or entity is allowed to access based on their permissions, roles, or other access control mechanisms.
+
+The reason for this order is straightforward: before you can determine what someone is allowed to do (authorization), you need to know who they are (authentication). Authentication establishes the identity, and authorization defines the permissions associated with that identity.
+
+In the context of web applications, middleware for authentication is typically applied first in the request-response cycle to verify the user's identity. If authentication is successful, the request proceeds to authorization middleware to determine what the authenticated user is allowed to do
+
+It's important to note that while authentication and authorization are often discussed as distinct steps, they work together as essential components of a security strategy to control access to resources and protect against unauthorized actions.
+
+• Now we will implement Authentication as a middleware Function. So that, Routes will be authenticated before reaching out to the server.
+
+• Implementing authentication as a middleware function is a common and effective approach.
+
+• Passport.js-----
+
+Passport.js is a popular authentication middleware for Node.js. Authentication is the process of verifying the identity of a user, typically through a username and password, before granting access to certain resources or features on a website or application.
+
+Think of Passport is as a helpful tool that makes it easier for developers to handle user authentication in their Node.js applications. It simplifies the process of authenticating users by providing a set of pre-built strategies for different authentication methods. such as username and password, social media logins (like Facebook or Google), and more
+
+Here's a breakdown of some key concepts in Passport.js:
+
+1. Middleware: In the context of web development, middleware is software that sits between the application and the server. Passport.js acts as middleware, intercepting requests and adding authentication-related functionality to them.
+
+2. Strategy: Passport.js uses the concept of strategies for handling different authentication methods. A strategy is a way of authenticating users. Passport.js comes with various built-in strategies, and you can also create custom strategies to support specific authentication providers.
+
+3. Serialize and Deserialize: Passport.js provides methods for serializing and deserializing user data Serialization is the process of converting user data into a format that can be stored, usually as a unique identifier. Deserialization is the reverse process of converting that unique identifier back into user data. These processes are essential for managing user sessions.
+
+•Install Passport
+
+To use Passport.js in a Node.js application, you need to install the passport package along with the authentication strategies you intend to use.
+
+For this course, we are using Local strategies authentication (username and password).
+
+you would typically install passport-local
+
+npm install passport passport-local
+
+Once you've installed these packages, you can set up and configure Passport is in your application.
+
+• Passport Local Strategy
+
+• The Passport Local Strategy is a part of the Passport.js authentication middleware for Node.js. It's specifically designed for handling username and password-based authentication.
+
+• The Passport Local Strategy, by default, expects to extract the username and password from the request body. It is a common practice for username and password-based authentication systems to send the credentials as part of the request body, especially in login forms.
+
+
+
+• Configure the Local Strategy
+
+Define and configure the Local Strategy using passport-local.
+
+• You need to provide a verification function that checks the provided username and password.
+
+
+In the Local Strategy's verification function, you typically query your database to find the user with the provided username. You then compare the provided password with the stored password.
+
+In the context of LocalStrategy, Passport.js expects the verification function to have the following signature
+
+• The done callback should always be the last parameter, and it's essential to maintain this order for Passport.js to work correctly. If you change the order of parameters, you risk breaking the expected behavior of Passport.js.
+
+
+• In the context of Passport.js, done is a callback function that is provided by Passport to signal the completion of an authentication attempt. It is used to indicate whether the authentication was successful, and if so, to provide information about the authenticated user.
+
+• The done function takes three parameters: done (error, user, info).
+
+• If the authentication is successful, you call done (null, user) where user is an object representing the authenticated user.
+
+• If the authentication fails, you call done(null, false, { message: some message}). The second parameter (false) indicates that authentication failed, and the third parameter is an optional info object that can be used to provide additional details about the failure.
+
+
+PASSWORD HASH SALTING
+• Now we have to update our person model to store hashed passwords. Modify the registration logic to hash the password before saving it to the database. • Because the end user didn't know about hashing, we have to internally maintain it. Like we are saving the hashed password before saving it into the database
+
+• We are using a Mongoose middleware hook to perform an action before saving a document to the database. Specifically, it's using the pre middleware to execute function before the save operation.
+
+
+• The pre('save', )middleware is triggered before the save operation on a Mongoose model instance.
+
+• Inside the middleware function, it checks if the password field has been modified (or if it's a new document). If not, it skips the hashing process.
+
+If the password has been modified, it generates a new salt using
+
+bcrypt.genSalt and then hashes the password using bcrypt.hash.
+
+• The original plain text password in the person document is then replaced with the hashed password
+
+The next() function is called to proceed with the save operation.
+
+The line const salt = await bcrypt.genSalt(10); is responsible for generating a salt, which is a random string of characters used as an additional Input to the password hashing function. Salting is a crucial step in password hashing to prevent attackers from using precomputed tables (rainbow tables) to quickly look up the hash value of a password.
+
+bcrypt.genSalt(rounds): This function generates a salt using the specified number of "rounds." The rounds parameter indicates the complexity of the hashing algorithm. The higher the number of rounds, the more secure the salt, but it also increases the computational cost.
+
+(person.isModified("password")) return next();
+
+This line is a conditional check that prevents unnecessary rehashing of the password when the document is being saved.
+
+person.isModified('password'): This method is provided by Mongoose and retums true if the specified field ('password' in this case) has been modified. It retums false if the field hasn't been modified.
+
+• return next() :: If the password field has not been modified, the function Immediately retums, skipping the rest of the middleware. This is because there's no need to rehash the password if it hasn't changed.
+
+How bcrypt works
+
+When you use bcrypt to hash a password, the library internally stores the salt as part of the resulting hashed password. This means that you don't need to separately store the salt in your db, it is included in hashed password itself
+
+Here's a simplified explanation of how it works::
+
+1. Hashing a Password:
+
+When you hash a password using bcrypt.hash, the library generates a random salt. hashes the password along with the salt, and produces a hashed password that Incorporates both the salt and the hashed value.
+
+const salt = await bcrypt.genSalt(10);
+
+const hashedPassword await bcrypt.hash('userPassword', salt);
+
+The hashedPassword now contains both the hashed password and the salt.
+
+
+Verifying a Password
+
+When you later want to verify a user's entered password during login, you use borypt.compare. This function internally extracts the salt from the stored hashed password and uses it to hash the entered password for comparison.
+
+const isMatch = await bcrypt.compare('enteredPassword', storedHashedPassword);
+
+The compare function automatically extracts the salt from storedHashed Password and uses it to hash the entered password. It then compares the resulting hash with the stored hash. If they match, it indicates that the entered password is correct.
+
+
